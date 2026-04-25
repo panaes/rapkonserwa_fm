@@ -1,13 +1,321 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>rapkonserwa_fm</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RapKonserwa FM</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            font-family: 'Courier New', monospace;
+            color: #fff;
+        }
+        .container {
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+        }
+        .logo {
+            margin-bottom: 2rem;
+        }
+        .logo img {
+            height: 60px;
+            object-fit: contain;
+        }
+        .cover {
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%;
+            margin-bottom: 2rem;
+            background: #222;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 2px solid #333;
+        }
+        .cover img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .track-info {
+            margin-bottom: 2rem;
+        }
+        .track-info h2 {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .track-info p {
+            font-size: 12px;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .progress-container {
+            margin-bottom: 1.5rem;
+        }
+        input[type="range"] {
+            width: 100%;
+            height: 2px;
+            background: #333;
+            border: none;
+            border-radius: 0;
+            outline: none;
+            cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+            border: 2px solid #333;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+            border: 2px solid #333;
+        }
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #666;
+            margin-top: 6px;
+            font-family: monospace;
+        }
+        .controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        button {
+            cursor: pointer;
+            border: none;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
+        }
+        .btn-side {
+            background: #222;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 12px 16px;
+            font-size: 12px;
+        }
+        .btn-side:hover {
+            background: #333;
+        }
+        .btn-play {
+            background: #fff;
+            color: #000;
+            padding: 16px 24px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .btn-play:hover {
+            transform: scale(1.05);
+        }
+        .volume-container {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .volume-label {
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+        }
+        .volume-slider {
+            flex: 1;
+        }
+        .status {
+            margin-top: 2rem;
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .status p {
+            margin: 4px 0;
+        }
+        .loading {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img id="logo" src="https://archive.org/services/img/arek_szewczyk" alt="RapKonserwa">
+        </div>
+
+        <div id="loading" class="loading">⏳ Ładuję tracki...</div>
+
+        <div id="player" style="display: none;">
+            <div class="cover">
+                <img id="cover" src="" alt="Cover">
+            </div>
+
+            <div class="track-info">
+                <h2 id="title">Track Title</h2>
+                <p id="duration">0:00</p>
+            </div>
+
+            <div class="progress-container">
+                <input type="range" id="progress" min="0" max="100" value="0">
+                <div class="time-display">
+                    <span id="currentTime">0:00</span>
+                    <span id="totalTime">0:00</span>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="btn-side" onclick="previousTrack()">⏮ PREV</button>
+                <button class="btn-play" id="playBtn" onclick="togglePlay()">▶ PLAY</button>
+                <button class="btn-side" onclick="nextTrack()">NEXT ⏭</button>
+            </div>
+
+            <div class="volume-container">
+                <label class="volume-label">VOL</label>
+                <input type="range" class="volume-slider" id="volume" min="0" max="1" step="0.1" value="1" onchange="setVolume(this.value)">
+            </div>
+
+            <div class="status">
+                <p id="trackCount">1 / 0 tracks</p>
+                <p>AUTO-PLAY: ON | SHUFFLE: ON</p>
+            </div>
+        </div>
+    </div>
+
+    <audio id="audio" crossorigin="anonymous"></audio>
+
+    <script>
+        let tracks = [];
+        let currentIdx = 0;
+        let isPlaying = false;
+        const audio = document.getElementById('audio');
+
+        function formatTime(seconds) {
+            if (!seconds || isNaN(seconds)) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        async function fetchTracks() {
+            try {
+                const res = await fetch(
+                    'https://archive.org/advancedsearch.php?q=creator:%22arek_szewczyk%22%20mediatype:audio&output=json&rows=500&fl=identifier,title,duration,description'
+                );
+                const data = await res.json();
+                
+                tracks = [];
+                for (const doc of data.response.docs) {
+                    if (doc.duration && parseInt(doc.duration) >= 150) {
+                        tracks.push({
+                            id: doc.identifier,
+                            title: doc.title || doc.identifier,
+                            duration: parseInt(doc.duration)
+                        });
+                    }
+                }
+                
+                if (tracks.length > 0) {
+                    tracks.sort(() => Math.random() - 0.5);
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('player').style.display = 'block';
+                    loadTrack(0);
+                }
+            } catch (err) {
+                console.error('Error:', err);
+            }
+        }
+
+        function loadTrack(idx) {
+            currentIdx = idx % tracks.length;
+            const track = tracks[currentIdx];
+            
+            document.getElementById('title').textContent = track.title;
+            document.getElementById('cover').src = `https://archive.org/services/img/${track.id}`;
+            document.getElementById('trackCount').textContent = `${currentIdx + 1} / ${tracks.length} tracks`;
+            
+            audio.src = `https://archive.org/download/${track.id}/${track.id}_vbr.m4a`;
+            audio.onloadedmetadata = () => {
+                document.getElementById('progress').max = audio.duration;
+                document.getElementById('totalTime').textContent = formatTime(audio.duration);
+            };
+            audio.play();
+            isPlaying = true;
+            document.getElementById('playBtn').textContent = '⏸ PAUSE';
+        }
+
+        function togglePlay() {
+            if (isPlaying) {
+                audio.pause();
+                isPlaying = false;
+                document.getElementById('playBtn').textContent = '▶ PLAY';
+            } else {
+                audio.play();
+                isPlaying = true;
+                document.getElementById('playBtn').textContent = '⏸ PAUSE';
+            }
+        }
+
+        function nextTrack() {
+            loadTrack(currentIdx + 1);
+        }
+
+        function previousTrack() {
+            loadTrack(currentIdx - 1 + tracks.length);
+        }
+
+        function setVolume(val) {
+            audio.volume = val;
+        }
+
+        audio.addEventListener('timeupdate', () => {
+            document.getElementById('progress').value = audio.currentTime;
+            document.getElementById('currentTime').textContent = formatTime(audio.currentTime);
+        });
+
+        audio.addEventListener('ended', () => {
+            nextTrack();
+        });
+
+        document.getElementById('progress').addEventListener('change', (e) => {
+            audio.currentTime = e.target.value;
+        });
+
+        fetchTracks();
+        setInterval(fetchTracks, 300000);
+    </script>
+</body>
 </html>
