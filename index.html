@@ -3,326 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RapKonserwa FM</title>
+    <title>RapKonserwa FM - Debug</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
         body {
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: #0a0a0a;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
             padding: 2rem;
-            font-family: 'Courier New', monospace;
-            color: #fff;
+            max-width: 800px;
+            margin: 0 auto;
         }
-        .container {
-            width: 100%;
-            max-width: 480px;
-            text-align: center;
-        }
-        .logo {
-            margin-bottom: 2rem;
-        }
-        .logo img {
-            height: 60px;
-            object-fit: contain;
-        }
-        .cover {
-            position: relative;
-            width: 100%;
-            padding-bottom: 100%;
-            margin-bottom: 2rem;
-            background: #222;
-            border-radius: 4px;
-            overflow: hidden;
-            border: 2px solid #333;
-        }
-        .cover img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .track-info {
-            margin-bottom: 2rem;
-        }
-        .track-info h2 {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .track-info p {
-            font-size: 12px;
-            color: #aaa;
-            text-transform: uppercase;
-        }
-        .progress-container {
-            margin-bottom: 1.5rem;
-        }
-        input[type="range"] {
-            width: 100%;
-            height: 2px;
-            background: #333;
-            border: none;
-            cursor: pointer;
-            -webkit-appearance: none;
-        }
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #fff;
-            cursor: pointer;
-            border: 2px solid #333;
-        }
-        input[type="range"]::-moz-range-thumb {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #fff;
-            cursor: pointer;
-            border: 2px solid #333;
-        }
-        .time-display {
-            display: flex;
-            justify-content: space-between;
-            font-size: 11px;
-            color: #666;
-            margin-top: 6px;
-        }
-        .controls {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            margin-bottom: 2rem;
-        }
-        button {
-            cursor: pointer;
-            border: none;
-            font-family: 'Courier New', monospace;
-            text-transform: uppercase;
-            transition: all 0.2s;
-        }
-        .btn-side {
-            background: #222;
-            border: 1px solid #444;
-            color: #fff;
-            padding: 12px 16px;
-            font-size: 12px;
-        }
-        .btn-side:hover {
-            background: #333;
-        }
-        .btn-play {
-            background: #fff;
-            color: #000;
-            padding: 16px 24px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-        .btn-play:hover {
-            transform: scale(1.05);
-        }
-        .volume-container {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-        .volume-label {
-            font-size: 11px;
-            color: #666;
-            text-transform: uppercase;
-        }
-        .status {
-            margin-top: 2rem;
-            font-size: 11px;
-            color: #666;
-            text-transform: uppercase;
-        }
-        .loading {
-            font-size: 12px;
-            color: #666;
-        }
-        .error {
-            color: #ff6b6b;
-            font-size: 12px;
+        pre {
+            background: #111;
+            padding: 1rem;
+            border: 1px solid #333;
+            overflow-x: auto;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="logo">
-            <img id="logo" src="https://archive.org/services/img/arek_szewczyk" alt="RapKonserwa" onerror="this.style.display='none'">
-        </div>
-
-        <div id="loading" class="loading">⏳ Ładuję tracki...</div>
-        <div id="error" class="error" style="display:none;"></div>
-
-        <div id="player" style="display: none;">
-            <div class="cover">
-                <img id="cover" src="" alt="Cover">
-            </div>
-
-            <div class="track-info">
-                <h2 id="title">Track Title</h2>
-                <p id="duration">0:00</p>
-            </div>
-
-            <div class="progress-container">
-                <input type="range" id="progress" min="0" max="100" value="0">
-                <div class="time-display">
-                    <span id="currentTime">0:00</span>
-                    <span id="totalTime">0:00</span>
-                </div>
-            </div>
-
-            <div class="controls">
-                <button class="btn-side" onclick="previousTrack()">⏮ PREV</button>
-                <button class="btn-play" id="playBtn" onclick="togglePlay()">▶ PLAY</button>
-                <button class="btn-side" onclick="nextTrack()">NEXT ⏭</button>
-            </div>
-
-            <div class="volume-container">
-                <label class="volume-label">VOL</label>
-                <input type="range" id="volume" min="0" max="1" step="0.1" value="1" onchange="setVolume(this.value)">
-            </div>
-
-            <div class="status">
-                <p id="trackCount">1 / 0 tracks</p>
-                <p>AUTO-PLAY: ON | SHUFFLE: ON</p>
-            </div>
-        </div>
-    </div>
-
-    <audio id="audio" crossorigin="anonymous"></audio>
+    <h1>🔍 Debug RapKonserwa</h1>
+    <p>Szukam Twoich uploadów...</p>
+    <pre id="output"></pre>
 
     <script>
-        let tracks = [];
-        let currentIdx = 0;
-        let isPlaying = false;
-        const audio = document.getElementById('audio');
+        async function debug() {
+            const output = document.getElementById('output');
+            
+            // Spróbuj różnych query
+            const queries = [
+                'creator:"arek_szewczyk" mediatype:audio',
+                'uploader:arek_szewczyk mediatype:audio',
+                'creator:arek_szewczyk',
+                'RapKonserwa'
+            ];
 
-        function formatTime(seconds) {
-            if (!seconds || isNaN(seconds)) return '0:00';
-            const mins = Math.floor(seconds / 60);
-            const secs = Math.floor(seconds % 60);
-            return `${mins}:${secs.toString().padStart(2, '0')}`;
-        }
-
-        async function fetchTracks() {
-            try {
-                const res = await fetch(
-                    'https://archive.org/advancedsearch.php?q=creator:%22arek_szewczyk%22%20mediatype:audio&output=json&rows=500&fl=identifier,title,duration'
-                );
-                const data = await res.json();
-                
-                if (!data.response || !data.response.docs) {
-                    throw new Error('Brak danych z IA');
+            for (const query of queries) {
+                output.textContent += `\n\n=== QUERY: ${query} ===\n`;
+                try {
+                    const res = await fetch(
+                        `https://archive.org/advancedsearch.php?q=${encodeURIComponent(query)}&output=json&rows=10&fl=identifier,title,duration,creator,uploader`
+                    );
+                    const data = await res.json();
+                    
+                    output.textContent += `Znaleziono: ${data.response.numFound} wyników\n\n`;
+                    
+                    data.response.docs.forEach(doc => {
+                        output.textContent += `ID: ${doc.identifier}\n`;
+                        output.textContent += `Title: ${doc.title || 'brak'}\n`;
+                        output.textContent += `Duration: ${doc.duration || 'brak'}\n`;
+                        output.textContent += `Creator: ${doc.creator || 'brak'}\n`;
+                        output.textContent += `Uploader: ${doc.uploader || 'brak'}\n`;
+                        output.textContent += `---\n`;
+                    });
+                } catch (err) {
+                    output.textContent += `Błąd: ${err.message}\n`;
                 }
-
-                tracks = [];
-                for (const doc of data.response.docs) {
-                    if (doc.duration && parseInt(doc.duration) >= 150) {
-                        tracks.push({
-                            id: doc.identifier,
-                            title: doc.title || doc.identifier,
-                            duration: parseInt(doc.duration)
-                        });
-                    }
-                }
-                
-                if (tracks.length > 0) {
-                    tracks.sort(() => Math.random() - 0.5);
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('error').style.display = 'none';
-                    document.getElementById('player').style.display = 'block';
-                    loadTrack(0);
-                } else {
-                    throw new Error('Nie znaleziono trackach powyżej 2:30');
-                }
-            } catch (err) {
-                console.error('Błąd:', err);
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('error').style.display = 'block';
-                document.getElementById('error').textContent = 'Błąd: ' + err.message;
             }
         }
 
-        function loadTrack(idx) {
-            currentIdx = idx % tracks.length;
-            const track = tracks[currentIdx];
-            
-            document.getElementById('title').textContent = track.title;
-            document.getElementById('cover').src = `https://archive.org/services/img/${track.id}`;
-            document.getElementById('trackCount').textContent = `${currentIdx + 1} / ${tracks.length} tracks`;
-            
-            const trackUrl = `https://archive.org/download/${track.id}/${track.id}_vbr.m4a`;
-            audio.src = trackUrl;
-            
-            audio.onloadedmetadata = () => {
-                document.getElementById('progress').max = audio.duration;
-                document.getElementById('totalTime').textContent = formatTime(audio.duration);
-                audio.play();
-                isPlaying = true;
-                document.getElementById('playBtn').textContent = '⏸ PAUSE';
-            };
-
-            audio.onerror = () => {
-                console.log('M4A nie zadziałał, spróbuję MP3');
-                audio.src = `https://archive.org/download/${track.id}/${track.id}.mp3`;
-                audio.play();
-            };
-        }
-
-        function togglePlay() {
-            if (isPlaying) {
-                audio.pause();
-                isPlaying = false;
-                document.getElementById('playBtn').textContent = '▶ PLAY';
-            } else {
-                audio.play();
-                isPlaying = true;
-                document.getElementById('playBtn').textContent = '⏸ PAUSE';
-            }
-        }
-
-        function nextTrack() {
-            loadTrack(currentIdx + 1);
-        }
-
-        function previousTrack() {
-            loadTrack(currentIdx - 1 + tracks.length);
-        }
-
-        function setVolume(val) {
-            audio.volume = val;
-        }
-
-        audio.addEventListener('timeupdate', () => {
-            document.getElementById('progress').value = audio.currentTime;
-            document.getElementById('currentTime').textContent = formatTime(audio.currentTime);
-        });
-
-        audio.addEventListener('ended', () => {
-            nextTrack();
-        });
-
-        document.getElementById('progress').addEventListener('change', (e) => {
-            audio.currentTime = e.target.value;
-        });
-
-        fetchTracks();
-        setInterval(fetchTracks, 300000);
+        debug();
     </script>
 </body>
 </html>
